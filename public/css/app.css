@@ -17631,3 +17631,9 @@ readers do not read off random characters that represent icons */
 .nav .nav-treeview > .nav-item > a {
   padding-left: 40px;
 }
+
+.nav-sidebar .nav-link p {
+  display: inline;
+  margin: 5px;
+  white-space: normal;
+}
