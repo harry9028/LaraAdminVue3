@@ -31,14 +31,14 @@
             </ul>
 
             <!-- SEARCH FORM -->
-            <div class="input-group input-group-sm col-md-6">
+            {{-- <div class="input-group input-group-sm col-md-6">
                 <input class="form-control form-control-navbar" @keyup="searchit" v-model="search" type="search" placeholder="Search" aria-label="Search">
                 <div class="input-group-append">
                 <button class="btn btn-navbar btn-success" @click="searchit">
                     <i class="fa fa-search"></i>
                 </button>
                 </div>
-            </div>
+            </div> --}}
         </nav>
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->

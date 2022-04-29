@@ -11,7 +11,6 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 // window.Fire = new Vue();
 
-
 import routes from './routes';
 
 const router = createRouter({
@@ -44,6 +43,8 @@ window.gate = new Gate(window.user);
 import moment from 'moment';
 window.moment = moment;
 
+import VueCtkDateTimePicker from "vue-ctk-date-time-picker";
+
 const app = createApp({
     // options object
     data() {
@@ -52,6 +53,7 @@ const app = createApp({
             search: ''
         }
     },
+
     methods: {
         searchit: _.debounce(() => {
             Fire.$emit('searching');
@@ -61,4 +63,6 @@ const app = createApp({
 app.use(router)
 app.component('sidebar', require('./components/backend/Sidebar.vue').default)
 app.component('not-found', require('./components/NotFound.vue').default)
+app.component('common-form', require('./components/backend/CommonMessageForm.vue').default);
+app.component("VueCtkDateTimePicker", VueCtkDateTimePicker)
 app.mount('#app');
