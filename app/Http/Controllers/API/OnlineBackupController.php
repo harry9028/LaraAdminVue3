@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\OnlineBackup;
+use App\Models\OnlineBackup;
 use Storage;
 class OnlineBackupController extends Controller
 {

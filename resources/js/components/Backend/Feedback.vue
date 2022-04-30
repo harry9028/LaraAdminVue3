@@ -1,6 +1,6 @@
 <template>
- <div class="content-wrapper">
-     <section class="content-header">
+  <div class="content-wrapper">
+    <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
@@ -12,11 +12,11 @@
             </ol>
           </div>
         </div>
-      </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.container-fluid -->
     </section>
     <section class="content">
       <div class="container-fluid">
-        
         <div class="row">
           <div class="col-12">
             <div class="card">
@@ -41,28 +41,36 @@
                     </thead>
                     <tbody>
                       <tr v-for="user in FeedbackList.data" :key="user.id">
-                          <td>{{user.id}}</td>
-                          <td>{{user.category}}</td>
-                          <td>{{user.name }}</td>
-                          <td>{{user.mobile}}</td>
-                          <td>{{user.email}}</td>
-                          <td>{{user.type_software }}</td>
-                          <td>{{user.msg}}</td>
-                          <td>{{user.date | myDate}}</td>
-                          <td>
-                              <!-- <button type="button" class="btn btn-primary" @click="editModal(user)">Edit <i class="fas fa-user-edit"></i></button>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.category }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.mobile }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.type_software }}</td>
+                        <td>{{ user.msg }}</td>
+                        <td>{{ user.date }}</td>
+                        <td>
+                          <!-- <button type="button" class="btn btn-primary" @click="editModal(user)">Edit <i class="fas fa-user-edit"></i></button>
                               <button type="button" class="btn btn-danger" @click="deleteUser(user.id)">Delete <i class="fas fa-trash"></i></button> -->
-                          </td>
+                        </td>
                       </tr>
-
                     </tbody>
                   </table>
                 </div>
               </div>
               <div class="card-footer clearfix">
-                <pagination :data="FeedbackList" @pagination-change-page="getResults" :limit="8" :show-disabled="true">
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-	                <span slot="next-nav"><i class="fas fa-caret-right"></i></span>
+                <pagination
+                  :data="FeedbackList"
+                  @pagination-change-page="getResults"
+                  :limit="8"
+                  :show-disabled="true"
+                >
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -70,43 +78,38 @@
             <!-- /.card -->
           </div>
         </div>
-
-      </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.container-fluid -->
     </section>
-   
   </div>
-   
 </template>
 
 <script>
-    export default {
-      data () {
-            return {             
-              // users empty array
-              editmode: false,
-              FeedbackList : {},
-            }
-        },
-        methods: {
-            loadEnquiry(){
-              if(this.$gate.isSuperAdminOrAdmin()){
-
-                this.$Progress.start()
-                axios.get("api/feedback").then(({ data }) => (this.FeedbackList = data));
-                this.$Progress.finish()
-              }
-              
-            },
-            // Our method to GET results from a Laravel endpoint
-            getResults(page = 1) {
-               axios.get('api/feedback?page=' + page)
-                        .then(response => {
-                            this.FeedbackList = response.data;
-                    });
-            },
-        },
-        mounted() {
-          this.loadEnquiry();
-        }
+import LaravelVuePagination from "laravel-vue-pagination";
+export default {
+  components: {
+    pagination: LaravelVuePagination,
+  },
+  data() {
+    return {
+      // users empty array
+      editmode: false,
+      FeedbackList: {},
     };
+  },
+  methods: {
+    loadEnquiry() {
+      axios.get("api/feedback").then(({ data }) => (this.FeedbackList = data));
+    },
+    // Our method to GET results from a Laravel endpoint
+    getResults(page = 1) {
+      axios.get("api/feedback?page=" + page).then((response) => {
+        this.FeedbackList = response.data;
+      });
+    },
+  },
+  mounted() {
+    this.loadEnquiry();
+  },
+};
 </script>

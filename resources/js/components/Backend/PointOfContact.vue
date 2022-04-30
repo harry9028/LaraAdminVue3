@@ -66,7 +66,7 @@
                         <td>{{ contact.reseller_company_name }}</td>
                         <td>{{ contact.sales_person_name }}</td>
                         <td>{{ contact.lead_generated_by }}</td>
-                        <td>{{ contact.created_at | myDate2 }}</td>
+                        <td>{{ contact.created_at }}</td>
                         <td>
                           <div
                             class="btn-group"
@@ -100,10 +100,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -111,345 +113,429 @@
             <!-- /.card -->
           </div>
         </div>
-
-        <b-modal
-          ref="newModal"
-          size="xl"
-          scrollable
-          :title="editmode ? 'Update Info' : 'Add New'"
+        <div
+          class="modal fade bd-example-modal-lg"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myLargeModalLabel"
+          aria-hidden="true"
+          id="newModal"
         >
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="tmpos_id">Atlantic User:</label>
-                <!-- <input v-model="form.tmpos_id" type="text" name="tmpos_id" :disabled="editmode" placeholder="" 
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('tmpos_id') }"> -->
-
-                <multiselect
-                  v-model="searchValue"
-                  :options="ownerList"
-                  :custom-label="nameWithLang"
-                  placeholder="Select atlantic user"
-                  label="name"
-                  track-by="tmpos_id"
-                  @select="onSelect"
-                ></multiselect>
-                <!-- <pre class="language-json"><code>{{ form.tmpos_id  }}</code></pre> -->
-
-                <has-error :form="form" field="tmpos_id"></has-error>
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="poc_name">Point Of Contact Name:</label>
-                <input
-                  v-model="form.poc_name"
-                  type="text"
-                  name="poc_name"
-                  placeholder=""
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('poc_name') }"
-                />
-                <has-error :form="form" field="poc_name"></has-error>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="tmpos_id">Atlantic User:</label>
+                      <!-- <multiselect
+                        v-model="searchValue"
+                        :options="ownerList"
+                        :custom-label="nameWithLang"
+                        placeholder="Select atlantic user"
+                        label="name"
+                        track-by="tmpos_id"
+                        @select="onSelect"
+                      ></multiselect> -->
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('tmpos_id')"
+                        v-html="form.errors.get('tmpos_id')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="poc_name">Point Of Contact Name:</label>
+                      <input
+                        v-model="form.poc_name"
+                        type="text"
+                        name="poc_name"
+                        placeholder=""
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('poc_name') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('poc_name')"
+                        v-html="form.errors.get('poc_name')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="poc_contact_no">Point Of Contact No:</label>
+                      <input
+                        v-model="form.poc_contact_no"
+                        type="text"
+                        name="poc_contact_no"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('poc_contact_no'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('poc_contact_no')"
+                        v-html="form.errors.get('poc_contact_no')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="poc_alternate_contact_no"
+                        >POC Alternative Contact No:</label
+                      >
+                      <input
+                        v-model="form.poc_alternate_contact_no"
+                        type="text"
+                        name="poc_alternate_contact_no"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'poc_alternate_contact_no'
+                          ),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('poc_alternate_contact_no')"
+                        v-html="form.errors.get('poc_alternate_contact_no')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="poc_company_mail_id"
+                        >Point Of Contact Company Email:</label
+                      >
+                      <input
+                        v-model="form.poc_company_mail_id"
+                        type="text"
+                        name="poc_company_mail_id"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('poc_company_mail_id'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('poc_company_mail_id')"
+                        v-html="form.errors.get('poc_company_mail_id')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="poc_address">Point Of Contact Address:</label>
+                      <textarea
+                        v-model="form.poc_address"
+                        type="text"
+                        name="poc_address"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('poc_address'),
+                        }"
+                      ></textarea>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('poc_address')"
+                        v-html="form.errors.get('poc_address')"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="reseller_company_name"
+                        >Reseller Company Name:</label
+                      >
+                      <input
+                        v-model="form.reseller_company_name"
+                        type="text"
+                        name="reseller_company_name"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'reseller_company_name'
+                          ),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('reseller_company_name')"
+                        v-html="form.errors.get('reseller_company_name')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="reseller_company_mail_id"
+                        >Reseller Company Email:</label
+                      >
+                      <input
+                        v-model="form.reseller_company_mail_id"
+                        type="text"
+                        name="reseller_company_mail_id"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'reseller_company_mail_id'
+                          ),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('reseller_company_mail_id')"
+                        v-html="form.errors.get('reseller_company_mail_id')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="reseller_company_address"
+                        >Reseller Company Address:</label
+                      >
+                      <textarea
+                        v-model="form.reseller_company_address"
+                        type="text"
+                        name="reseller_company_address"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'reseller_company_address'
+                          ),
+                        }"
+                      ></textarea>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('reseller_company_address')"
+                        v-html="form.errors.get('reseller_company_address')"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="sales_person_name">Sales Person Name:</label>
+                      <input
+                        v-model="form.sales_person_name"
+                        type="text"
+                        name="sales_person_name"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('sales_person_name'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sales_person_name')"
+                        v-html="form.errors.get('sales_person_name')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="sales_person_mail_id"
+                        >Sales Person Email:</label
+                      >
+                      <input
+                        v-model="form.sales_person_mail_id"
+                        type="text"
+                        name="sales_person_mail_id"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('sales_person_mail_id'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sales_person_mail_id')"
+                        v-html="form.errors.get('sales_person_mail_id')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="sales_person_address"
+                        >Sales Person Address:</label
+                      >
+                      <textarea
+                        v-model="form.sales_person_address"
+                        type="text"
+                        name="sales_person_address"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('sales_person_address'),
+                        }"
+                      ></textarea>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sales_person_address')"
+                        v-html="form.errors.get('sales_person_address')"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="lead_generated_by">Lead Generated By:</label>
+                      <input
+                        v-model="form.lead_generated_by"
+                        type="text"
+                        name="lead_generated_by"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('lead_generated_by'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('lead_generated_by')"
+                        v-html="form.errors.get('lead_generated_by')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="lead_generatedby_contactno"
+                        >Lead Generatedby Contact no:</label
+                      >
+                      <input
+                        v-model="form.lead_generatedby_contactno"
+                        type="text"
+                        name="lead_generatedby_contactno"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'lead_generatedby_contactno'
+                          ),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('lead_generatedby_contactno')"
+                        v-html="form.errors.get('lead_generatedby_contactno')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="lead_generatedby_address"
+                        >Lead Generated by address:</label
+                      >
+                      <textarea
+                        v-model="form.lead_generatedby_address"
+                        type="text"
+                        name="lead_generatedby_address"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'lead_generatedby_address'
+                          ),
+                        }"
+                      ></textarea>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('lead_generatedby_address')"
+                        v-html="form.errors.get('lead_generatedby_address')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="lead_generatedby_mail"
+                        >Lead Generated by mail:</label
+                      >
+                      <input
+                        v-model="form.lead_generatedby_mail"
+                        type="text"
+                        name="lead_generatedby_mail"
+                        placeholder=""
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'lead_generatedby_mail'
+                          ),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('lead_generatedby_mail')"
+                        v-html="form.errors.get('lead_generatedby_mail')"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="poc_contact_no">Point Of Contact No:</label>
-                <input
-                  v-model="form.poc_contact_no"
-                  type="text"
-                  name="poc_contact_no"
-                  placeholder=""
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('poc_contact_no') }"
-                />
-                <has-error :form="form" field="poc_contact_no"></has-error>
+              <div class="modal-footer">
+                <button
+                  class="btn btn-primary"
+                  v-if="editmode"
+                  @click="update()"
+                >
+                  Update
+                </button>
+                <button
+                  class="btn btn-primary"
+                  v-if="!editmode"
+                  @click="create()"
+                >
+                  Create
+                </button>
+                <button class="btn btn-danger" @click="cancel()">Cancel</button>
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="poc_alternate_contact_no"
-                  >POC Alternative Contact No:</label
-                >
-                <input
-                  v-model="form.poc_alternate_contact_no"
-                  type="text"
-                  name="poc_alternate_contact_no"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('poc_alternate_contact_no'),
-                  }"
-                />
-                <has-error
-                  :form="form"
-                  field="poc_alternate_contact_no"
-                ></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="poc_company_mail_id"
-                  >Point Of Contact Company Email:</label
-                >
-                <input
-                  v-model="form.poc_company_mail_id"
-                  type="text"
-                  name="poc_company_mail_id"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('poc_company_mail_id'),
-                  }"
-                />
-                <has-error :form="form" field="poc_company_mail_id"></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="poc_address">Point Of Contact Address:</label>
-                <textarea
-                  v-model="form.poc_address"
-                  type="text"
-                  name="poc_address"
-                  placeholder=""
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('poc_address') }"
-                ></textarea>
-                <has-error :form="form" field="poc_address"></has-error>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="reseller_company_name"
-                  >Reseller Company Name:</label
-                >
-                <input
-                  v-model="form.reseller_company_name"
-                  type="text"
-                  name="reseller_company_name"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('reseller_company_name'),
-                  }"
-                />
-                <has-error
-                  :form="form"
-                  field="reseller_company_name"
-                ></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="reseller_company_mail_id"
-                  >Reseller Company Email:</label
-                >
-                <input
-                  v-model="form.reseller_company_mail_id"
-                  type="text"
-                  name="reseller_company_mail_id"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('reseller_company_mail_id'),
-                  }"
-                />
-                <has-error
-                  :form="form"
-                  field="reseller_company_mail_id"
-                ></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="reseller_company_address"
-                  >Reseller Company Address:</label
-                >
-                <textarea
-                  v-model="form.reseller_company_address"
-                  type="text"
-                  name="reseller_company_address"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('reseller_company_address'),
-                  }"
-                ></textarea>
-                <has-error
-                  :form="form"
-                  field="reseller_company_address"
-                ></has-error>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="sales_person_name">Sales Person Name:</label>
-                <input
-                  v-model="form.sales_person_name"
-                  type="text"
-                  name="sales_person_name"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('sales_person_name'),
-                  }"
-                />
-                <has-error :form="form" field="sales_person_name"></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="sales_person_mail_id">Sales Person Email:</label>
-                <input
-                  v-model="form.sales_person_mail_id"
-                  type="text"
-                  name="sales_person_mail_id"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('sales_person_mail_id'),
-                  }"
-                />
-                <has-error
-                  :form="form"
-                  field="sales_person_mail_id"
-                ></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="sales_person_address">Sales Person Address:</label>
-                <textarea
-                  v-model="form.sales_person_address"
-                  type="text"
-                  name="sales_person_address"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('sales_person_address'),
-                  }"
-                ></textarea>
-                <has-error
-                  :form="form"
-                  field="sales_person_address"
-                ></has-error>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="lead_generated_by">Lead Generated By:</label>
-                <input
-                  v-model="form.lead_generated_by"
-                  type="text"
-                  name="lead_generated_by"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('lead_generated_by'),
-                  }"
-                />
-                <has-error :form="form" field="lead_generated_by"></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="lead_generatedby_contactno"
-                  >Lead Generatedby Contact no:</label
-                >
-                <input
-                  v-model="form.lead_generatedby_contactno"
-                  type="text"
-                  name="lead_generatedby_contactno"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('lead_generatedby_contactno'),
-                  }"
-                />
-                <has-error
-                  :form="form"
-                  field="lead_generatedby_contactno"
-                ></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="lead_generatedby_address"
-                  >Lead Generated by address:</label
-                >
-                <textarea
-                  v-model="form.lead_generatedby_address"
-                  type="text"
-                  name="lead_generatedby_address"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('lead_generatedby_address'),
-                  }"
-                ></textarea>
-                <has-error
-                  :form="form"
-                  field="lead_generatedby_address"
-                ></has-error>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                <label for="lead_generatedby_mail"
-                  >Lead Generated by mail:</label
-                >
-                <input
-                  v-model="form.lead_generatedby_mail"
-                  type="text"
-                  name="lead_generatedby_mail"
-                  placeholder=""
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('lead_generatedby_mail'),
-                  }"
-                />
-                <has-error
-                  :form="form"
-                  field="lead_generatedby_mail"
-                ></has-error>
-              </div>
-            </div>
-          </div>
-          <template v-slot:modal-footer>
-            <b-button
-              size="sm"
-              v-if="editmode"
-              variant="success"
-              @click="update()"
-            >
-              Update
-            </b-button>
-            <b-button
-              size="sm"
-              v-if="!editmode"
-              variant="success"
-              @click="create()"
-            >
-              Create
-            </b-button>
-            <b-button size="sm" variant="danger" @click="cancel()">
-              Cancel
-            </b-button>
-          </template>
-        </b-modal>
+        </div>
       </div>
       <!-- /.container-fluid -->
     </section>
@@ -457,10 +543,13 @@
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <script>
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 import Multiselect from "vue-multiselect";
 export default {
   components: {
     Multiselect,
+    pagination: LaravelVuePagination,
   },
   data() {
     return {
@@ -490,6 +579,7 @@ export default {
         lead_generatedby_mail: "",
         lead_generatedby_address: "",
       }),
+      search: "",
     };
   },
   methods: {
@@ -499,7 +589,7 @@ export default {
       this.isLoad = true;
       // point-of-contact
       axios
-        .get("api/point-of-contact?q=" + this.$parent.search + "&page=" + page)
+        .get("api/point-of-contact?q=" + this.search + "&page=" + page)
         .then((response) => {
           this.isLoad = false;
           //   console.log(response.data);
@@ -569,9 +659,6 @@ export default {
   mounted() {
     this.getResults();
     this.getOwnerList();
-    Fire.$on("searching", () => {
-      this.getResults();
-    });
   },
 };
 </script>

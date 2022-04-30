@@ -16,14 +16,14 @@ class AtlanticPosUsersMapping extends Model
 
     public function Owner()
     {
-         return $this->hasone('App\TMPOS_USER', 'tmpos_id','tmpos_id');
+         return $this->hasone('App\Models\TMPOS_USER', 'tmpos_id','tmpos_id');
     }
     public function Outlet()
     {
-         return $this->hasone('App\Outlet','store_id', 'tmpos_store_id');
+         return $this->hasone('App\Models\Outlet','store_id', 'tmpos_store_id');
     }
     public function ChannelStore()
     {
-        return $this->hasone('App\ChannelStores','ref_id', 'tmchannel_store_id')->with('ChannelOwner:owner_name,tracking_id,username');
+        return $this->hasone('App\Models\ChannelStores','ref_id', 'tmchannel_store_id')->with('ChannelOwner:owner_name,tracking_id,username');
     }
 }

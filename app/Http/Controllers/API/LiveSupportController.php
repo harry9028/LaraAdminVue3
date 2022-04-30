@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\LiveSupportEnquiry;
+use App\Models\LiveSupportEnquiry;
 use DB;
 class LiveSupportController extends Controller
 {

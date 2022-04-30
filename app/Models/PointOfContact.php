@@ -32,6 +32,6 @@ class PointOfContact extends Model
          return "{$this->poc_name} - {$this->poc_contact_no}";
       }
       public function AtlanticUser(){
-         return $this->hasOne('App\TMPOS_USER', 'tmpos_id','tmpos_id')->select('tmpos_id', 'name', 'username');
+         return $this->hasOne('App\Models\TMPOS_USER', 'tmpos_id','tmpos_id')->select('tmpos_id', 'name', 'username');
       }
 }

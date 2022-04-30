@@ -29,9 +29,30 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-4">
+                    <div class="input-group mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="search"
+                        aria-label="search"
+                        aria-describedby="basic-addon2"
+                        v-model="search"
+                      />
+                      <div class="input-group-append">
+                        <button
+                          class="btn btn-secondary"
+                          @click="getResults"
+                          type="button"
+                        >
+                          Search
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label>Outlet Registered From - To Date</label>
-                      <date-range-picker
+                      <!-- <date-range-picker
                         class="form-control"
                         style="
                           min-width: 235px;
@@ -49,13 +70,13 @@
                         placeholder="Date time"
                         opens="center"
                       >
-                      </date-range-picker>
+                      </date-range-picker> -->
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Activation expires From - To Date</label>
-                      <date-range-picker
+                      <!-- <date-range-picker
                         class="form-control"
                         style="
                           min-width: 235px;
@@ -72,7 +93,7 @@
                         placeholder="Date time"
                         opens="center"
                       >
-                      </date-range-picker>
+                      </date-range-picker> -->
                     </div>
                   </div>
                 </div>
@@ -124,21 +145,23 @@
                         <td>{{ outlet.email }}</td>
 
                         <td>
-                          <b-badge variant="primary" v-if="outlet.active == 1"
-                            >Yes</b-badge
+                          <span
+                            class="badge badge-primary"
+                            v-if="outlet.active == 1"
+                            >Yes</span
                           >
-                          <b-badge variant="danger" v-else>No</b-badge>
+                          <span class="badge badge-danger" v-else>No</span>
                         </td>
                         <td>
                           <p v-if="outlet.last_order">
-                            {{ outlet.last_order.orderDateTime | myDate2 }}
+                            {{ outlet.last_order.orderDateTime }}
                           </p>
                           <p v-else>-</p>
                         </td>
-                        <td>{{ outlet.created_at | myDate2 }}</td>
+                        <td>{{ outlet.created_at }}</td>
                         <td>
                           <p v-if="outlet.activation_expires_at">
-                            {{ outlet.activation_expires_at | myDate2 }}
+                            {{ outlet.activation_expires_at }}
                           </p>
                           <p v-else>-</p>
                         </td>
@@ -166,10 +189,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -192,13 +217,8 @@
           >
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="addNewLabel">View</h5>
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
+                <h5 class="modal-title" id="addNewLabel">Details</h5>
+                <button type="button" class="close" @click="closeModel">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -245,7 +265,7 @@
                       <th>Activation expires at</th>
                       <td>
                         <p v-if="OutletInfo.activation_expires_at">
-                          {{ OutletInfo.activation_expires_at | myDate2 }}
+                          {{ OutletInfo.activation_expires_at }}
                         </p>
                         <p v-else>-</p>
                       </td>
@@ -254,30 +274,37 @@
                     <tr>
                       <th>Outlet Active</th>
                       <td>
-                        <b-form-checkbox
-                          v-model="OutletInfo.active"
-                          name="check-button"
-                          value="1"
-                          unchecked-value="0"
-                          switch
-                        >
-                        </b-form-checkbox>
+                        <div class="form-group form-check">
+                          <label class="form-check-label">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              v-model="OutletInfo.active"
+                              value="1"
+                              unchecked-value="0"
+                            />
+                            Remember me
+                          </label>
+                        </div>
                       </td>
                       <th>Outlet Registration</th>
                       <td>
-                        {{ OutletInfo.created_at | myDate2 }}
+                        {{ OutletInfo.created_at }}
                       </td>
                     </tr>
                     <tr>
                       <td colspan="4">
-                        <label>Outlet Deactivate Message</label>
-                        <b-form-textarea
-                          id="textarea"
-                          v-model="OutletInfo.deactivate_message"
-                          placeholder="Enter something..."
-                          rows="3"
-                          max-rows="6"
-                        ></b-form-textarea>
+                        <div class="form-group">
+                          <label>Outlet Deactivate Message</label>
+                          <textarea
+                            class="form-control"
+                            id="comment"
+                            v-model="OutletInfo.deactivate_message"
+                            placeholder="Enter something..."
+                            rows="3"
+                            max-rows="6"
+                          ></textarea>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -287,7 +314,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  data-dismiss="modal"
+                  @click="closeModel"
                 >
                   Close
                 </button>
@@ -309,12 +336,14 @@
 </template>
 
 <script>
-import DateRangePicker from "vue2-daterange-picker";
-import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
-
+// import DateRangePicker from "vue2-daterange-picker";
+// import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 export default {
   components: {
-    DateRangePicker,
+    // DateRangePicker,
+    pagination: LaravelVuePagination,
   },
   data() {
     return {
@@ -355,6 +384,7 @@ export default {
         },
       }),
       maxDate: moment().format("YYYY-MM-DD"),
+      search: "",
     };
   },
   methods: {
@@ -368,7 +398,7 @@ export default {
       axios
         .get("/api/outlet-list", {
           params: {
-            q: this.$parent.search,
+            q: this.search,
             page: page,
             start: this.filter.dateRange.startDate
               ? moment(this.filter.dateRange.startDate).format(
@@ -429,12 +459,12 @@ export default {
           this.$Progress.fail();
         });
     },
+    closeModel() {
+      $("#newModal").modal("hide");
+    },
   },
   mounted() {
     this.getResults();
-    Fire.$on("searching", () => {
-      this.getResults();
-    });
   },
 };
 </script>

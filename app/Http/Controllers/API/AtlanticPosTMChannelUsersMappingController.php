@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\AtlanticPosUsersMapping;
+use App\Models\AtlanticPosUsersMapping;
 use App\Http\Requests\AtalanitcPosMappingRequest;
 use Illuminate\Database\Eloquent\Builder;
 

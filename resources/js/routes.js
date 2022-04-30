@@ -69,5 +69,70 @@ const routes = [
         name: 'tmpos-registrations',
         component: () => import('./components/backend/TMPOS-Registration.vue')
     },
+    {
+        path: '/activated-outlets',
+        name: 'activated-outlets',
+        component: () => import('./components/backend/OutletsComponent.vue')
+    },
+    {
+        path: '/atlantic-pos-tmchannel-mapping',
+        name: 'atlantic-pos-tmchannel-mapping',
+        component: () => import('./components/backend/Atlantic-Pos-Tmchannel-mapping.vue')
+    },
+    {
+        path: '/tmpos-enquiry',
+        name: 'tmpos-enquiry',
+        component: () => import('./components/backend/TMPOS-Enquiry.vue')
+    },
+    {
+        path: '/live-support',
+        name: 'live-support',
+        component: () => import('./components/backend/LiveSupport.vue')
+    },
+    {
+        path: '/tmpos-notifications',
+        name: 'tmpos-notifications',
+        component: () => import('./components/backend/NotificationComponent.vue')
+    },
+    {
+        path: '/send-sms',
+        name: 'send-sms',
+        component: () => import('./components/backend/SendSMS.vue')
+    },
+    {
+        path: '/pos-link',
+        name: 'pos-link',
+        component: () => import('./components/backend/PosLink.vue')
+    },
+    {
+        path: '/pos-demo-link',
+        name: 'pos-demo-link',
+        component: () => import('./components/backend/PosDemoLink.vue')
+    },
+    {
+        path: '/feedback',
+        name: 'feedback',
+        component: () => import('./components/backend/Feedback.vue')
+    },
+    {
+        path: '/online-backup',
+        name: 'online-backup',
+        component: () => import('./components/backend/OnlineBackups.vue')
+    },
+    {
+        path: '/campaign-enquiry',
+        name: 'campaign-enquiry',
+        component: () => import('./components/backend/Campaign-Enquiry.vue')
+    },
+    {
+        path: '/quick-enquiry',
+        name: 'quick-enquiry',
+        component: () => import('./components/backend/Quick-Enquiry.vue')
+    },
+    {
+        path: '/point-of-contact',
+        component: () => import('./components/backend/PointOfContact.vue')
+    },
+    { path: '/users', name: 'users', component: () => import('./components/UserComponent.vue') },
 ]
 export default routes;

@@ -54,11 +54,11 @@
                   <tbody>
                     <tr v-for="user in EnquiryLIst.data" :key="user.id">
                       <td>{{ user.id }}</td>
-                      <td>{{ user.user_id | upText }}</td>
+                      <td>{{ user.user_id }}</td>
                       <td>{{ user.email }}</td>
                       <td>{{ user.mobile }}</td>
                       <td>{{ user.need_support_on }}</td>
-                      <td>{{ user.time_date | myDate2 }}</td>
+                      <td>{{ user.time_date }}</td>
                       <td>
                         <span
                           class="badge badge-danger"
@@ -103,10 +103,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -134,12 +136,7 @@
                 <h5 class="modal-title" v-show="editmode" id="addNewLabel">
                   Update Info
                 </h5>
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
+                <button type="button" class="close" @click="closeModal">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -281,7 +278,7 @@
                   <button
                     type="button"
                     class="btn btn-danger"
-                    data-dismiss="modal"
+                    @click="closeModal"
                   >
                     Close
                   </button>
@@ -346,10 +343,12 @@
                       <option value="tsv">tsv</option>
                       <option value="html">html</option>
                     </select>
-                    <has-error
-                      :form="exportForm"
-                      field="exportType"
-                    ></has-error>
+
+                    <div
+                      class="text-danger"
+                      v-if="exportForm.errors.has('exportType')"
+                      v-html="exportForm.errors.get('exportType')"
+                    />
                   </div>
                   <div class="form-group" v-show="!ImportExport">
                     <VueCtkDateTimePicker
@@ -360,7 +359,12 @@
                       :noLabel="false"
                       :error="exportForm.errors.has('dateRange')"
                     />
-                    <has-error :form="exportForm" field="dateRange"></has-error>
+
+                    <div
+                      class="text-danger"
+                      v-if="exportForm.errors.has('dateRange')"
+                      v-html="exportForm.errors.get('dateRange')"
+                    />
                   </div>
                 </div>
                 <div class="modal-footer">
@@ -398,7 +402,12 @@
 </template>
 
 <script>
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 export default {
+  components: {
+    pagination: LaravelVuePagination,
+  },
   data() {
     return {
       // users empty array
@@ -438,18 +447,14 @@ export default {
   methods: {
     messageModel(user) {
       this.smsForm.mobile = user.mobile;
-      Fire.$emit("openSendSMSModal");
+      $("#smsFormModal").modal("show");
     },
     loadEnquiry() {
-      if (this.$gate.isSuperAdminOrAdmin()) {
-        this.$Progress.start();
-        this.isLoad = true;
-        axios.get("api/live-support").then((response) => {
-          this.EnquiryLIst = response.data;
-          this.isLoad = false;
-          this.$Progress.finish();
-        });
-      }
+      this.isLoad = true;
+      axios.get("api/live-support").then((response) => {
+        this.EnquiryLIst = response.data;
+        this.isLoad = false;
+      });
     },
     // Our method to GET results from a Laravel endpoint
     getResults(page = 1) {
@@ -479,28 +484,24 @@ export default {
       });
     },
     UpdateLiveSupport() {
-      this.$Progress.start();
       this.form
         .post("api/live-support/" + this.form.id)
         .then(() => {
           $("#newModal").modal("hide");
           this.getResults(this.page);
           Swal.fire("Good job!", "Info has been updated !", "success");
-          this.$Progress.finish();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
+    },
+    closeModal() {
+      $("#newModal").modal("hide");
     },
   },
   mounted() {
     this.loadEnquiry();
-    Fire.$on("searching", () => {
-      this.getResults();
-    });
+
     this.access_level =
       window.gate.user.access_level.atlantic_pos.support_queries;
-    console.log(this.access_level);
   },
 };
 </script>

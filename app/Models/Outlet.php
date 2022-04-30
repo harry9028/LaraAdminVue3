@@ -21,12 +21,12 @@ class Outlet extends Model
          'activation_expires_at'
      ];
      public function AtlanticUser(){
-         return $this->hasOne('App\TMPOS_USER', 'tmpos_id','tmpos_id')
+         return $this->hasOne('App\Models\TMPOS_USER', 'tmpos_id','tmpos_id')
             ->select('tmpos_id', 'name', 'email','mobile','address','owner_name');
       }
     public function LastOrder()
     {
-          return $this->hasOne('App\BackOfficeOrder', 'store_id','store_id')
+          return $this->hasOne('App\Models\BackOfficeOrder', 'store_id','store_id')
             ->select('app_source', 'orderDateTime', 'store_id')
             ->where('app_source', 'atlantic_pos')
           ->latest();

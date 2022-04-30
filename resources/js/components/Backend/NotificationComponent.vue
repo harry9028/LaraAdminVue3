@@ -180,10 +180,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
             </div>
@@ -211,12 +213,7 @@
               <h5 class="modal-title" v-show="editmode" id="addNewLabel">
                 Update Info
               </h5>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
+              <button type="button" class="close" @click="closeModel">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -242,10 +239,12 @@
                           'is-invalid': form.errors.has('notification_title'),
                         }"
                       />
-                      <has-error
-                        :form="form"
-                        field="notification_title"
-                      ></has-error>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('notification_title')"
+                        v-html="form.errors.get('notification_title')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="notification_description"
@@ -263,10 +262,12 @@
                           ),
                         }"
                       />
-                      <has-error
-                        :form="form"
-                        field="notification_description"
-                      ></has-error>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('notification_description')"
+                        v-html="form.errors.get('notification_description')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="notification_type"
@@ -288,10 +289,11 @@
                         <option value="3">Backoffice</option>
                       </select>
 
-                      <has-error
-                        :form="form"
-                        field="notification_type"
-                      ></has-error>
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('notification_type')"
+                        v-html="form.errors.get('notification_type')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="where_to_show_notification"
@@ -314,10 +316,11 @@
                         <option value="3">Only Notification</option>
                       </select>
 
-                      <has-error
-                        :form="form"
-                        field="where_to_show_notification"
-                      ></has-error>
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('where_to_show_notification')"
+                        v-html="form.errors.get('where_to_show_notification')"
+                      />
                     </div>
                   </div>
 
@@ -338,10 +341,12 @@
                           <label class="custom-file-label">Choose file</label>
                         </div>
                       </div>
-                      <has-error
-                        :form="form"
-                        field="image_popup_path"
-                      ></has-error>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('image_popup_path')"
+                        v-html="form.errors.get('image_popup_path')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="popup_click_link"
@@ -357,10 +362,12 @@
                           'is-invalid': form.errors.has('popup_click_link'),
                         }"
                       />
-                      <has-error
-                        :form="form"
-                        field="popup_click_link"
-                      ></has-error>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('popup_click_link')"
+                        v-html="form.errors.get('popup_click_link')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="notification_image_path"
@@ -378,10 +385,12 @@
                           <label class="custom-file-label">Choose file</label>
                         </div>
                       </div>
-                      <has-error
-                        :form="form"
-                        field="notification_image_path"
-                      ></has-error>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('notification_image_path')"
+                        v-html="form.errors.get('notification_image_path')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="user_type">User Type :</label>
@@ -397,7 +406,11 @@
                         <option value="2">New User</option>
                       </select>
 
-                      <has-error :form="form" field="user_type"></has-error>
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('user_type')"
+                        v-html="form.errors.get('user_type')"
+                      />
                     </div>
                     <div class="form-group">
                       <label for="user_type"></label>
@@ -422,7 +435,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  data-dismiss="modal"
+                  @click="closeModel"
                 >
                   Close
                 </button>
@@ -446,7 +459,12 @@
 </template>
 
 <script>
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 export default {
+  components: {
+    pagination: LaravelVuePagination,
+  },
   data() {
     return {
       Notifications: {
@@ -516,12 +534,11 @@ export default {
     },
     getResults(page = 1) {
       this.isLoad = true;
-      this.$Progress.start();
+
       axios.get("api/tmpos-notifications").then((response) => {
         this.isLoad = false;
         this.Notifications = response.data.result;
       });
-      this.$Progress.finish();
     },
     newModal() {
       this.editmode = false;
@@ -537,7 +554,6 @@ export default {
       this.form.is_active = x.is_active == 1 ? true : false;
     },
     updateNotification() {
-      this.$Progress.start();
       this.isLoad = true;
       this.form
         .post("api/tmpos-notifications/" + this.form.id)
@@ -550,14 +566,10 @@ export default {
             title: "Notification has been updated",
           });
           this.getResults();
-          this.$Progress.finish();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
     },
     createNotification() {
-      this.$Progress.start();
       this.isLoad = true;
       this.form
         .post("api/tmpos-notifications")
@@ -568,11 +580,11 @@ export default {
             title: "Notification has been created",
           });
           this.getResults();
-          this.$Progress.finish();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
+    },
+    closeModel() {
+      $("#newModal").modal("hide");
     },
   },
   mounted() {

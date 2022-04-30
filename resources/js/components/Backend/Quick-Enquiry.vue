@@ -80,7 +80,7 @@
                         <!-- <td>{{user.required_date}}</td> -->
                         <td>
                           <address v-bind:id="user.id" style="display: block">
-                            {{ user.comment | capital(7) }}
+                            {{ user.comment || capital(7) }}
                             <a
                               v-show="user.comment.length > 10"
                               @click="readMore(user)"
@@ -94,7 +94,7 @@
                         <td>{{ user.ref_from }}</td>
                         <!-- <td>{{user.product_name}}</td> -->
                         <!-- <td>{{user.address}}</td> -->
-                        <td>{{ user.date | myDate2 }}</td>
+                        <td>{{ user.date }}</td>
 
                         <td>
                           <div
@@ -130,10 +130,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -468,7 +470,12 @@
 </template>
 
 <script>
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 export default {
+  components: {
+    pagination: LaravelVuePagination,
+  },
   data() {
     return {
       // users empty array
@@ -496,25 +503,22 @@ export default {
         dateRange: "",
       }),
       access_level: {},
+      search: "",
     };
   },
   methods: {
     SoftwareList() {
-      if (this.$gate.isSuperAdminOrAdmin()) {
-        this.$Progress.start();
-        this.isLoad = true;
-        axios.get("api/quick-enquiry").then(({ data }) => {
-          this.QuickEnquiryList = data;
-          this.isLoad = false;
-        });
-        this.$Progress.finish();
-      }
+      this.isLoad = true;
+      axios.get("api/quick-enquiry").then(({ data }) => {
+        this.QuickEnquiryList = data;
+        this.isLoad = false;
+      });
     },
     // Our method to GET results from a Laravel endpoint
     getResults(page = 1) {
       this.isLoad = true;
       axios
-        .get("api/quick-enquiry?q=" + this.$parent.search + "&page=" + page)
+        .get("api/quick-enquiry?q=" + this.search + "&page=" + page)
         .then((response) => {
           this.QuickEnquiryList = response.data;
           this.isLoad = false;
@@ -532,21 +536,16 @@ export default {
       $("#newModal").modal("show");
     },
     updateUser() {
-      this.$Progress.start();
       this.form
         .post("api/quick-enquiry/" + this.form.id)
         .then(() => {
           $("#newModal").modal("hide");
-          Fire.$emit("AfterCreate");
+          this.SoftwareList();
           Swal.fire("Good job!", "Info has been updated !", "success");
-          this.$Progress.finish();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
     },
     createUser() {
-      this.$Progress.start();
       this.form
         .post("api/quick-enquiry")
         .then(({ data }) => {
@@ -555,12 +554,9 @@ export default {
             type: "success",
             title: "Link Created successfully",
           });
-          Fire.$emit("AfterCreate");
-          this.$Progress.finish();
+          this.SoftwareList();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
     },
     readMore(user) {
       $("#" + user.id).text(user.comment);
@@ -590,14 +586,8 @@ export default {
   },
   mounted() {
     this.SoftwareList();
-    Fire.$on("AfterCreate", () => {
-      this.SoftwareList();
-    });
-    Fire.$on("searching", () => {
-      this.getResults();
-    });
+
     this.access_level = window.gate.user.access_level.enquiry.quick_enquiry;
-    // console.log(this.access_level);
   },
 };
 </script>

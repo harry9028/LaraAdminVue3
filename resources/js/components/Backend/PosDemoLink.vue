@@ -49,7 +49,7 @@
                     <tbody>
                       <tr v-for="user in VideoList.data" :key="user.id">
                         <td>{{ user.id }}</td>
-                        <td>{{ user.title | upText }}</td>
+                        <td>{{ user.title }}</td>
                         <td>
                           <a v-bind:href="user.link" target="_blank">{{
                             user.link
@@ -89,10 +89,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -117,12 +119,7 @@
                 <h5 class="modal-title" v-show="editmode" id="addNewLabel">
                   Update Info
                 </h5>
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
+                <button type="button" class="close" @click="closeModel">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -138,7 +135,12 @@
                       class="form-control"
                       :class="{ 'is-invalid': form.errors.has('title') }"
                     ></textarea>
-                    <has-error :form="form" field="title"></has-error>
+
+                    <div
+                      class="text-danger"
+                      v-if="form.errors.has('title')"
+                      v-html="form.errors.get('title')"
+                    />
                   </div>
                   <div class="form-group">
                     <label for="link">Link:</label>
@@ -150,14 +152,19 @@
                       class="form-control"
                       :class="{ 'is-invalid': form.errors.has('link') }"
                     ></textarea>
-                    <has-error :form="form" field="link"></has-error>
+
+                    <div
+                      class="text-danger"
+                      v-if="form.errors.has('link')"
+                      v-html="form.errors.get('link')"
+                    />
                   </div>
                 </div>
                 <div class="modal-footer">
                   <button
                     type="button"
                     class="btn btn-danger"
-                    data-dismiss="modal"
+                    @click="closeModel"
                   >
                     Close
                   </button>
@@ -187,7 +194,12 @@
 </template>
 
 <script>
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 export default {
+  components: {
+    pagination: LaravelVuePagination,
+  },
   data() {
     return {
       // VideoList empty array
@@ -205,15 +217,11 @@ export default {
   },
   methods: {
     loadVideos() {
-      if (this.$gate.isSuperAdminOrAdmin()) {
-        this.isLoad = true;
-        this.$Progress.start();
-        axios.get("api/videos").then(({ data }) => {
-          this.VideoList = data;
-          this.$Progress.finish();
-          this.isLoad = false;
-        });
-      }
+      this.isLoad = true;
+      axios.get("api/videos").then(({ data }) => {
+        this.VideoList = data;
+        this.isLoad = false;
+      });
     },
     // Our method to GET results from a Laravel endpoint
     getResults(page = 1) {
@@ -236,21 +244,16 @@ export default {
       $("#newModal").modal("show");
     },
     updateUser() {
-      this.$Progress.start();
       this.form
         .post("api/videos/" + this.form.id)
         .then(() => {
           $("#newModal").modal("hide");
-          Fire.$emit("AfterCreate");
+          this.loadVideos();
           Swal.fire("Good job!", "Info has been updated !", "success");
-          this.$Progress.finish();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
     },
     createUser() {
-      this.$Progress.start();
       this.form
         .post("api/videos")
         .then(({ data }) => {
@@ -259,24 +262,18 @@ export default {
             type: "success",
             title: "Video link Created successfully",
           });
-          Fire.$emit("AfterCreate");
-          this.$Progress.finish();
+          this.loadVideos();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
+    },
+    closeModel() {
+      $("#newModal").modal("hide");
     },
   },
   mounted() {
     this.loadVideos();
-    Fire.$on("AfterCreate", () => {
-      this.loadVideos();
-    });
-    Fire.$on("searching", () => {
-      this.getResults();
-    });
+
     this.access_level = window.gate.user.access_level.links.pos_demo_links;
-    // console.log(this.access_level);
   },
 };
 </script>

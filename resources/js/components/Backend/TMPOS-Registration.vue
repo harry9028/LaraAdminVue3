@@ -29,6 +29,27 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-4">
+                    <div class="input-group mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="search"
+                        aria-label="search"
+                        aria-describedby="basic-addon2"
+                        v-model="search"
+                      />
+                      <div class="input-group-append">
+                        <button
+                          class="btn btn-secondary"
+                          @click="getResults"
+                          type="button"
+                        >
+                          Search
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label>From - To Date</label>
                       <!-- <date-range-picker
@@ -222,807 +243,875 @@
             ></textarea>
           </div>
         </div>
-
-        <b-modal
-          ref="newModal"
-          size="xl"
-          scrollable
-          :title="editmode ? 'Update Info' : 'Add New'"
+        <div
+          class="modal fade bd-example-modal-lg"
+          id="newModal"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myLargeModalLabel"
+          aria-hidden="true"
         >
-          <div class="row">
-            <div class="col-md-3">
-              <label for="tmpos_id">TMPOS Id:</label>
-              <input
-                v-model="form.tmpos_id"
-                type="text"
-                name="tmpos_id"
-                placeholder="Enter Tmpos Id"
-                class="form-control"
-                :class="{ 'is-invalid': form.errors.has('tmpos_id') }"
-                :disabled="editmode"
-              />
-
-              <div
-                class="text-danger"
-                v-if="form.errors.has('tmpos_id')"
-                v-html="form.errors.get('tmpos_id')"
-              />
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="country_id">Country:</label>
-                <select
-                  v-model="form.country_id"
-                  name="country_id"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('country_id') }"
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  {{ editmode ? "Update Info" : "Add New" }}
+                </h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  @click="closeModal"
                 >
-                  <option
-                    v-for="x in CountryList"
-                    :key="x.id"
-                    v-bind:value="x.id"
-                  >
-                    {{ x.name }}
-                  </option>
-                </select>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('country_id')"
-                  v-html="form.errors.get('country_id')"
-                />
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="name">Outlet Name:</label>
-                <input
-                  v-model="form.name"
-                  type="text"
-                  name="name"
-                  placeholder="Enter name"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('name') }"
-                />
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label for="tmpos_id">TMPOS Id:</label>
+                    <input
+                      v-model="form.tmpos_id"
+                      type="text"
+                      name="tmpos_id"
+                      placeholder="Enter Tmpos Id"
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.has('tmpos_id') }"
+                      :disabled="editmode"
+                    />
 
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('name')"
-                  v-html="form.errors.get('name')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="owner_name">Owner Name:</label>
-                <input
-                  v-model="form.owner_name"
-                  type="text"
-                  name="owner_name"
-                  placeholder="Enter owner name"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('owner_name') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('owner_name')"
-                  v-html="form.errors.get('owner_name')"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="email">Email:</label>
-                <input
-                  v-model="form.email"
-                  type="text"
-                  name="email"
-                  placeholder="Enter email"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('email') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('email')"
-                  v-html="form.errors.get('email')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="username">Username:</label>
-                <input
-                  v-model="form.username"
-                  type="text"
-                  name="username"
-                  placeholder="Enter username"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('username') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('username')"
-                  v-html="form.errors.get('username')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3" v-if="!editmode">
-              <div class="form-group">
-                <label for="password">Password:</label>
-                <input
-                  v-model="form.password"
-                  type="text"
-                  name="password"
-                  placeholder="Enter password"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('password') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('password')"
-                  v-html="form.errors.get('password')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="mobile">Mobile No.</label>
-                <input
-                  v-model="form.mobile"
-                  type="text"
-                  name="mobile"
-                  placeholder="Enter mobile"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('mobile') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('mobile')"
-                  v-html="form.errors.get('mobile')"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="address">Address:</label>
-                <textarea
-                  v-model="form.address"
-                  name="address"
-                  placeholder="Enter address"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('address') }"
-                ></textarea>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('address')"
-                  v-html="form.errors.get('address')"
-                />
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="api_key">API Key:</label>
-                <textarea
-                  v-model="form.api_key"
-                  name="api_key"
-                  placeholder="Enter api key"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('api_key') }"
-                  :disabled="true"
-                ></textarea>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('api_key')"
-                  v-html="form.errors.get('api_key')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_api_flag">SMS API:</label>
-                <select
-                  v-model="form.sms_api_flag"
-                  name="sms_api_flag"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('sms_api_flag') }"
-                >
-                  <!-- <option  v-for="x in SMSGetwayList" :key="x.id" v-bind:value="x.col2">{{x.col1}}</option> -->
-                  <option value="0" selected disabled>Select SMS API</option>
-                  <option value="1">SMS Horizon - India</option>
-                  <option value="2">Nagpur - India</option>
-                  <option value="3">Pinnacle SMS - India</option>
-                  <option value="4">Message Bird - Universal</option>
-                  <option value="5">Message Country - Universal</option>
-                </select>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_api_flag')"
-                  v-html="form.errors.get('sms_api_flag')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="custom-control custom-switch">
-                <input
-                  type="checkbox"
-                  v-model="form.is_active"
-                  name="is_active"
-                  class="custom-control-input"
-                  id="isActive"
-                />
-                <label class="custom-control-label" for="isActive"
-                  >Is Active</label
-                >
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_sender_id">SMS Sender Id:</label>
-                <input
-                  v-model="form.sms_sender_id"
-                  type="text"
-                  :disabled="form.sms_api_flag == 4"
-                  name="sms_sender_id"
-                  placeholder="Enter sms sender id"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('sms_sender_id') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_sender_id')"
-                  v-html="form.errors.get('sms_sender_id')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_api_key">SMS API Key:</label>
-                <input
-                  v-model="form.sms_api_key"
-                  type="text"
-                  name="sms_api_key"
-                  placeholder="Enter SMS API key"
-                  class="form-control"
-                  v-on:change="copyAPiPassword"
-                  :class="{ 'is-invalid': form.errors.has('sms_api_key') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_api_key')"
-                  v-html="form.errors.get('sms_api_key')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_api_user">SMS API User:</label>
-                <input
-                  v-model="form.sms_api_user"
-                  type="text"
-                  name="sms_api_user"
-                  placeholder="Enter SMS API User"
-                  class="form-control"
-                  :disabled="form.sms_api_flag == 3 || form.sms_api_flag == 4"
-                  :class="{ 'is-invalid': form.errors.has('sms_api_user') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_api_user')"
-                  v-html="form.errors.get('sms_api_user')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_api_password">SMS API Password:</label>
-                <input
-                  v-model="form.sms_api_password"
-                  type="text"
-                  name="sms_api_password"
-                  placeholder="Enter SMS Password"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('sms_api_password') }"
-                  disabled
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_api_password')"
-                  v-html="form.errors.get('sms_api_password')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="peid">SMS PEID:</label>
-                <input
-                  v-model="form.peid"
-                  type="text"
-                  name="peid"
-                  placeholder="Enter SMS PEID"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('peid') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('peid')"
-                  v-html="form.errors.get('peid')"
-                />
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_total">Total SMS:</label>
-                <input
-                  v-model="form.sms_total"
-                  type="text"
-                  name="sms_total"
-                  placeholder="Enter SMS Password"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('sms_total') }"
-                  :disabled="false"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_total')"
-                  v-html="form.errors.get('sms_total')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_left">Left SMS:</label>
-                <input
-                  v-model="form.sms_left"
-                  type="text"
-                  name="sms_left"
-                  placeholder="Left SMS"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('sms_left') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_left')"
-                  v-html="form.errors.get('sms_left')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="sms_sent">Sent SMS:</label>
-                <input
-                  v-model="form.sms_sent"
-                  type="text"
-                  name="sms_sent"
-                  placeholder="Sent SMS"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('sms_sent') }"
-                  :disabled="false"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('sms_sent')"
-                  v-html="form.errors.get('sms_sent')"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="dunzo_client_id">Dunzo Client ID: </label>
-                <input
-                  v-model="form.dunzo_client_id"
-                  type="text"
-                  name="dunzo_client_id"
-                  placeholder="Dunzo Client ID"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('dunzo_client_id') }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('dunzo_client_id')"
-                  v-html="form.errors.get('dunzo_client_id')"
-                />
-                <div class="valid-feedback" style="display: block">
-                  Configure the webhook on dunzo portal for delivery boy status
-                  updates
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="dunzo_client_secret">Dunzo Client Secret:</label>
-                <input
-                  v-model="form.dunzo_client_secret"
-                  type="text"
-                  name="dunzo_client_secret"
-                  placeholder="Dunzo Client Secret"
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('dunzo_client_secret'),
-                  }"
-                  :disabled="false"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('dunzo_client_secret')"
-                  v-html="form.errors.get('dunzo_client_secret')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="type">User Role:</label>
-                <select
-                  v-model="form.type"
-                  name="type"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('type') }"
-                  :disabled="false"
-                >
-                  <option value="">Select Role</option>
-                  <option value="super">Super Admin</option>
-                  <option value="admin">Admin</option>
-                  <option value="user">Standard User</option>
-                </select>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('type')"
-                  v-html="form.errors.get('type')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="email_verified_at">Email Verified At:</label>
-                <VueCtkDateTimePicker
-                  id="expired_at"
-                  :error="form.errors.has('email_verified_at')"
-                  color="#6c757d"
-                  :dark="false"
-                  :auto-close="true"
-                  button-color="#6c757d"
-                  v-model="form.email_verified_at"
-                  :range="false"
-                  :onlyDate="false"
-                  :inline="false"
-                  :noLabel="false"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('email_verified_at')"
-                  v-html="form.errors.get('email_verified_at')"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="login_deactive_message"
-                  >If User De Activate Login Message :</label
-                >
-                <input
-                  v-model="form.login_deactive_message"
-                  type="text"
-                  name="login_deactive_message"
-                  placeholder="De activate message"
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('login_deactive_message'),
-                  }"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('login_deactive_message')"
-                  v-html="form.errors.get('login_deactive_message')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="custom-control custom-switch">
-                <input
-                  type="checkbox"
-                  v-model="form.show_poweredby"
-                  name="show_poweredby"
-                  class="custom-control-input"
-                  id="show_poweredby"
-                />
-                <label class="custom-control-label" for="show_poweredby"
-                  >Show Powered By TMBill on Print:</label
-                >
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="custom-control custom-switch">
-                <input
-                  type="checkbox"
-                  v-model="form.send_notification"
-                  name="send_notification"
-                  class="custom-control-input"
-                  id="send_notification"
-                />
-                <label class="custom-control-label" for="send_notification"
-                  >Send Notification</label
-                >
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="poc"
-                  >Point of Contact:
-
-                  <b-icon
-                    @click="viewPointOfDetail()"
-                    v-if="form.poc"
-                    style="cursor: pointer"
-                    icon="star-fill"
-                    font-scale="2"
-                    aria-hidden="true"
-                    animation="throb"
-                    shift-v="-0.25"
-                    variant="info"
-                    scale="0.75"
-                  ></b-icon>
-                </label>
-                <select
-                  v-model="form.poc"
-                  name="poc"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('poc') }"
-                  :disabled="false"
-                >
-                  <option value="">Select Name</option>
-                  <option
-                    v-for="(p, i) in PointOfContactList"
-                    :key="i"
-                    :value="p.poc_contact_no"
-                  >
-                    {{ p.full_name }}
-                  </option>
-                </select>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('poc')"
-                  v-html="form.errors.get('poc')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="store_creation_limit">Store Creation Limit:</label>
-                <input
-                  v-model="form.store_creation_limit"
-                  type="text"
-                  name="store_creation_limit"
-                  placeholder="Store creation limit"
-                  class="form-control"
-                  :class="{
-                    'is-invalid': form.errors.has('store_creation_limit'),
-                  }"
-                  :disabled="!editmode"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('store_creation_limit')"
-                  v-html="form.errors.get('store_creation_limit')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="nextel_api_key">WhatsApp API Key:</label>
-                <input
-                  v-model="form.nextel_api_key"
-                  type="text"
-                  name="nextel_api_key"
-                  placeholder="Key"
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.has('nextel_api_key') }"
-                  :disabled="!editmode"
-                />
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('nextel_api_key')"
-                  v-html="form.errors.get('nextel_api_key')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <div class="custom-control custom-switch">
-                  <input
-                    type="checkbox"
-                    v-model="form.live_tracking_enabled"
-                    name="live_tracking_enabled"
-                    class="custom-control-input"
-                    id="live_tracking_enabled"
-                  />
-                  <label
-                    class="custom-control-label"
-                    for="live_tracking_enabled"
-                    >Enabled Live Tracking</label
-                  >
-                </div>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('live_tracking_enabled')"
-                  v-html="form.errors.get('live_tracking_enabled')"
-                />
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <div class="custom-control custom-switch">
-                  <input
-                    type="checkbox"
-                    v-model="form.upsale_integration"
-                    name="upsale_integration"
-                    class="custom-control-input"
-                    id="upsale_integration"
-                  />
-                  <label class="custom-control-label" for="upsale_integration"
-                    >UpSale Integration</label
-                  >
-                </div>
-
-                <div
-                  class="text-danger"
-                  v-if="form.errors.has('upsale_integration')"
-                  v-html="form.errors.get('upsale_integration')"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="row mt-3" v-if="form.access_level">
-            <div class="col-md-12">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Menu Name</th>
-                    <th>Is Show</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(x, index) in form.access_level" :key="index">
-                    <td>{{ RemoveUnderscore(index) }}</td>
-                    <td>
-                      <b-form-checkbox
-                        :id="index"
-                        v-model="x.is_show"
-                        value="1"
-                        unchecked-value="0"
+                    <div
+                      class="text-danger"
+                      v-if="form.errors.has('tmpos_id')"
+                      v-html="form.errors.get('tmpos_id')"
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="country_id">Country:</label>
+                      <select
+                        v-model="form.country_id"
+                        name="country_id"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('country_id') }"
                       >
-                      </b-form-checkbox>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                        <option
+                          v-for="x in CountryList"
+                          :key="x.id"
+                          v-bind:value="x.id"
+                        >
+                          {{ x.name }}
+                        </option>
+                      </select>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('country_id')"
+                        v-html="form.errors.get('country_id')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="name">Outlet Name:</label>
+                      <input
+                        v-model="form.name"
+                        type="text"
+                        name="name"
+                        placeholder="Enter name"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('name') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('name')"
+                        v-html="form.errors.get('name')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="owner_name">Owner Name:</label>
+                      <input
+                        v-model="form.owner_name"
+                        type="text"
+                        name="owner_name"
+                        placeholder="Enter owner name"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('owner_name') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('owner_name')"
+                        v-html="form.errors.get('owner_name')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="email">Email:</label>
+                      <input
+                        v-model="form.email"
+                        type="text"
+                        name="email"
+                        placeholder="Enter email"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('email') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('email')"
+                        v-html="form.errors.get('email')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="username">Username:</label>
+                      <input
+                        v-model="form.username"
+                        type="text"
+                        name="username"
+                        placeholder="Enter username"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('username') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('username')"
+                        v-html="form.errors.get('username')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3" v-if="!editmode">
+                    <div class="form-group">
+                      <label for="password">Password:</label>
+                      <input
+                        v-model="form.password"
+                        type="text"
+                        name="password"
+                        placeholder="Enter password"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('password') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('password')"
+                        v-html="form.errors.get('password')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="mobile">Mobile No.</label>
+                      <input
+                        v-model="form.mobile"
+                        type="text"
+                        name="mobile"
+                        placeholder="Enter mobile"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('mobile') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('mobile')"
+                        v-html="form.errors.get('mobile')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="address">Address:</label>
+                      <textarea
+                        v-model="form.address"
+                        name="address"
+                        placeholder="Enter address"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('address') }"
+                      ></textarea>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('address')"
+                        v-html="form.errors.get('address')"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="api_key">API Key:</label>
+                      <textarea
+                        v-model="form.api_key"
+                        name="api_key"
+                        placeholder="Enter api key"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('api_key') }"
+                        :disabled="true"
+                      ></textarea>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('api_key')"
+                        v-html="form.errors.get('api_key')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_api_flag">SMS API:</label>
+                      <select
+                        v-model="form.sms_api_flag"
+                        name="sms_api_flag"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('sms_api_flag'),
+                        }"
+                      >
+                        <!-- <option  v-for="x in SMSGetwayList" :key="x.id" v-bind:value="x.col2">{{x.col1}}</option> -->
+                        <option value="0" selected disabled>
+                          Select SMS API
+                        </option>
+                        <option value="1">SMS Horizon - India</option>
+                        <option value="2">Nagpur - India</option>
+                        <option value="3">Pinnacle SMS - India</option>
+                        <option value="4">Message Bird - Universal</option>
+                        <option value="5">Message Country - Universal</option>
+                      </select>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_api_flag')"
+                        v-html="form.errors.get('sms_api_flag')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="custom-control custom-switch">
+                      <input
+                        type="checkbox"
+                        v-model="form.is_active"
+                        name="is_active"
+                        class="custom-control-input"
+                        id="isActive"
+                      />
+                      <label class="custom-control-label" for="isActive"
+                        >Is Active</label
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_sender_id">SMS Sender Id:</label>
+                      <input
+                        v-model="form.sms_sender_id"
+                        type="text"
+                        :disabled="form.sms_api_flag == 4"
+                        name="sms_sender_id"
+                        placeholder="Enter sms sender id"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('sms_sender_id'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_sender_id')"
+                        v-html="form.errors.get('sms_sender_id')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_api_key">SMS API Key:</label>
+                      <input
+                        v-model="form.sms_api_key"
+                        type="text"
+                        name="sms_api_key"
+                        placeholder="Enter SMS API key"
+                        class="form-control"
+                        v-on:change="copyAPiPassword"
+                        :class="{
+                          'is-invalid': form.errors.has('sms_api_key'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_api_key')"
+                        v-html="form.errors.get('sms_api_key')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_api_user">SMS API User:</label>
+                      <input
+                        v-model="form.sms_api_user"
+                        type="text"
+                        name="sms_api_user"
+                        placeholder="Enter SMS API User"
+                        class="form-control"
+                        :disabled="
+                          form.sms_api_flag == 3 || form.sms_api_flag == 4
+                        "
+                        :class="{
+                          'is-invalid': form.errors.has('sms_api_user'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_api_user')"
+                        v-html="form.errors.get('sms_api_user')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_api_password">SMS API Password:</label>
+                      <input
+                        v-model="form.sms_api_password"
+                        type="text"
+                        name="sms_api_password"
+                        placeholder="Enter SMS Password"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('sms_api_password'),
+                        }"
+                        disabled
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_api_password')"
+                        v-html="form.errors.get('sms_api_password')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="peid">SMS PEID:</label>
+                      <input
+                        v-model="form.peid"
+                        type="text"
+                        name="peid"
+                        placeholder="Enter SMS PEID"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('peid') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('peid')"
+                        v-html="form.errors.get('peid')"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_total">Total SMS:</label>
+                      <input
+                        v-model="form.sms_total"
+                        type="text"
+                        name="sms_total"
+                        placeholder="Enter SMS Password"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('sms_total') }"
+                        :disabled="false"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_total')"
+                        v-html="form.errors.get('sms_total')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_left">Left SMS:</label>
+                      <input
+                        v-model="form.sms_left"
+                        type="text"
+                        name="sms_left"
+                        placeholder="Left SMS"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('sms_left') }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_left')"
+                        v-html="form.errors.get('sms_left')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="sms_sent">Sent SMS:</label>
+                      <input
+                        v-model="form.sms_sent"
+                        type="text"
+                        name="sms_sent"
+                        placeholder="Sent SMS"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('sms_sent') }"
+                        :disabled="false"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('sms_sent')"
+                        v-html="form.errors.get('sms_sent')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="dunzo_client_id">Dunzo Client ID: </label>
+                      <input
+                        v-model="form.dunzo_client_id"
+                        type="text"
+                        name="dunzo_client_id"
+                        placeholder="Dunzo Client ID"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('dunzo_client_id'),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('dunzo_client_id')"
+                        v-html="form.errors.get('dunzo_client_id')"
+                      />
+                      <div class="valid-feedback" style="display: block">
+                        Configure the webhook on dunzo portal for delivery boy
+                        status updates
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="dunzo_client_secret"
+                        >Dunzo Client Secret:</label
+                      >
+                      <input
+                        v-model="form.dunzo_client_secret"
+                        type="text"
+                        name="dunzo_client_secret"
+                        placeholder="Dunzo Client Secret"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('dunzo_client_secret'),
+                        }"
+                        :disabled="false"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('dunzo_client_secret')"
+                        v-html="form.errors.get('dunzo_client_secret')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="type">User Role:</label>
+                      <select
+                        v-model="form.type"
+                        name="type"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('type') }"
+                        :disabled="false"
+                      >
+                        <option value="">Select Role</option>
+                        <option value="super">Super Admin</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">Standard User</option>
+                      </select>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('type')"
+                        v-html="form.errors.get('type')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="email_verified_at">Email Verified At:</label>
+                      <VueCtkDateTimePicker
+                        id="expired_at"
+                        :error="form.errors.has('email_verified_at')"
+                        color="#6c757d"
+                        :dark="false"
+                        :auto-close="true"
+                        button-color="#6c757d"
+                        v-model="form.email_verified_at"
+                        :range="false"
+                        :onlyDate="false"
+                        :inline="false"
+                        :noLabel="false"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('email_verified_at')"
+                        v-html="form.errors.get('email_verified_at')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="login_deactive_message"
+                        >If User De Activate Login Message :</label
+                      >
+                      <input
+                        v-model="form.login_deactive_message"
+                        type="text"
+                        name="login_deactive_message"
+                        placeholder="De activate message"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has(
+                            'login_deactive_message'
+                          ),
+                        }"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('login_deactive_message')"
+                        v-html="form.errors.get('login_deactive_message')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="custom-control custom-switch">
+                      <input
+                        type="checkbox"
+                        v-model="form.show_poweredby"
+                        name="show_poweredby"
+                        class="custom-control-input"
+                        id="show_poweredby"
+                      />
+                      <label class="custom-control-label" for="show_poweredby"
+                        >Show Powered By TMBill on Print:</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="custom-control custom-switch">
+                      <input
+                        type="checkbox"
+                        v-model="form.send_notification"
+                        name="send_notification"
+                        class="custom-control-input"
+                        id="send_notification"
+                      />
+                      <label
+                        class="custom-control-label"
+                        for="send_notification"
+                        >Send Notification</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="poc"
+                        >Point of Contact:
+
+                        <i
+                          @click="viewPointOfDetail()"
+                          v-if="form.poc"
+                          style="cursor: pointer"
+                          icon="star-fill"
+                          font-scale="2"
+                          aria-hidden="true"
+                          animation="throb"
+                          shift-v="-0.25"
+                          variant="info"
+                          scale="0.75"
+                        ></i>
+                      </label>
+                      <select
+                        v-model="form.poc"
+                        name="poc"
+                        class="form-control"
+                        :class="{ 'is-invalid': form.errors.has('poc') }"
+                        :disabled="false"
+                      >
+                        <option value="">Select Name</option>
+                        <option
+                          v-for="(p, i) in PointOfContactList"
+                          :key="i"
+                          :value="p.poc_contact_no"
+                        >
+                          {{ p.full_name }}
+                        </option>
+                      </select>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('poc')"
+                        v-html="form.errors.get('poc')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="store_creation_limit"
+                        >Store Creation Limit:</label
+                      >
+                      <input
+                        v-model="form.store_creation_limit"
+                        type="text"
+                        name="store_creation_limit"
+                        placeholder="Store creation limit"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('store_creation_limit'),
+                        }"
+                        :disabled="!editmode"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('store_creation_limit')"
+                        v-html="form.errors.get('store_creation_limit')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="nextel_api_key">WhatsApp API Key:</label>
+                      <input
+                        v-model="form.nextel_api_key"
+                        type="text"
+                        name="nextel_api_key"
+                        placeholder="Key"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': form.errors.has('nextel_api_key'),
+                        }"
+                        :disabled="!editmode"
+                      />
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('nextel_api_key')"
+                        v-html="form.errors.get('nextel_api_key')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input
+                          type="checkbox"
+                          v-model="form.live_tracking_enabled"
+                          name="live_tracking_enabled"
+                          class="custom-control-input"
+                          id="live_tracking_enabled"
+                        />
+                        <label
+                          class="custom-control-label"
+                          for="live_tracking_enabled"
+                          >Enabled Live Tracking</label
+                        >
+                      </div>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('live_tracking_enabled')"
+                        v-html="form.errors.get('live_tracking_enabled')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input
+                          type="checkbox"
+                          v-model="form.upsale_integration"
+                          name="upsale_integration"
+                          class="custom-control-input"
+                          id="upsale_integration"
+                        />
+                        <label
+                          class="custom-control-label"
+                          for="upsale_integration"
+                          >UpSale Integration</label
+                        >
+                      </div>
+
+                      <div
+                        class="text-danger"
+                        v-if="form.errors.has('upsale_integration')"
+                        v-html="form.errors.get('upsale_integration')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-3" v-if="form.access_level">
+                  <div class="col-md-12">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Menu Name</th>
+                          <th>Is Show</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(x, index) in form.access_level"
+                          :key="index"
+                        >
+                          <td>{{ RemoveUnderscore(index) }}</td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              :id="index"
+                              v-model="x.is_show"
+                              value="1"
+                              unchecked-value="0"
+                              aria-label="Checkbox for following text input"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  v-if="editmode"
+                  @click="updateUser()"
+                >
+                  Update
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  v-if="!editmode"
+                  @click="createUser()"
+                >
+                  Create
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  variant="danger"
+                  @click="cancel()"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-          <template v-slot:modal-footer>
-            <b-button
-              size="sm"
-              v-if="editmode"
-              variant="success"
-              @click="updateUser()"
-            >
-              Update
-            </b-button>
-            <b-button
-              size="sm"
-              v-if="!editmode"
-              variant="success"
-              @click="createUser()"
-            >
-              Create
-            </b-button>
-            <b-button size="sm" variant="danger" @click="cancel()">
-              Cancel
-            </b-button>
-          </template>
-        </b-modal>
-        <b-modal ref="pocModal" size="xl" title="Point Of Contact Detail">
-          <div class="invoice p-3 mb-3">
-            <!-- title row -->
-            <div class="row">
-              <div class="col-12">
-                <h4>
-                  <i class="fas fa-globe"></i> TMBill Inc.
-                  <!-- <small class="float-right">Date: {{form.p_o_c.created_at }}</small> -->
-                </h4>
+        </div>
+        <div
+          class="modal fade bd-example-modal-lg"
+          id="pocModal"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myLargeModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="invoice p-3 mb-3">
+                <!-- title row -->
+                <div class="row">
+                  <div class="col-12">
+                    <h4>
+                      <i class="fas fa-globe"></i> TMBill Inc.
+                      <!-- <small class="float-right">Date: {{form.p_o_c.created_at }}</small> -->
+                    </h4>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <hr />
+                <!-- info row -->
+                <div class="row invoice-info">
+                  <div class="col-sm-3 invoice-col">
+                    <b>Point Of Contact</b>
+                    <address>
+                      <strong>{{ form.p_o_c.poc_name }}</strong
+                      ><br />
+                      {{ form.p_o_c.poc_address }}<br />
+                      {{ form.p_o_c.poc_contact_no }}<br />
+                      {{ form.p_o_c.poc_company_mail_id }}<br />
+                      {{ form.p_o_c.poc_alternate_contact_no }}<br />
+                    </address>
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-3 invoice-col">
+                    <b>Reseller Details</b>
+                    <address>
+                      <strong>{{ form.p_o_c.reseller_company_name }}</strong
+                      ><br />
+                      {{ form.p_o_c.reseller_company_address }}<br />
+                      {{ form.p_o_c.reseller_company_mail_id }}<br />
+                    </address>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                    <b>Sales Person Details</b>
+                    <address>
+                      <strong>{{ form.p_o_c.sales_person_name }}</strong
+                      ><br />
+                      {{ form.p_o_c.sales_person_address }}<br />
+                      {{ form.p_o_c.sales_person_mail_id }}
+                    </address>
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-3 invoice-col">
+                    <b>Lead Generated By</b>
+                    <address>
+                      <strong>{{ form.p_o_c.lead_generated_by }}</strong
+                      ><br />
+                      {{ form.p_o_c.lead_generatedby_address }}<br />
+                      {{ form.p_o_c.lead_generatedby_contactno }}<br />
+                      {{ form.p_o_c.lead_generatedby_mail }}
+                    </address>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
               </div>
-              <!-- /.col -->
             </div>
-            <hr />
-            <!-- info row -->
-            <div class="row invoice-info">
-              <div class="col-sm-3 invoice-col">
-                <b>Point Of Contact</b>
-                <address>
-                  <strong>{{ form.p_o_c.poc_name }}</strong
-                  ><br />
-                  {{ form.p_o_c.poc_address }}<br />
-                  {{ form.p_o_c.poc_contact_no }}<br />
-                  {{ form.p_o_c.poc_company_mail_id }}<br />
-                  {{ form.p_o_c.poc_alternate_contact_no }}<br />
-                </address>
-              </div>
-              <!-- /.col -->
-              <div class="col-sm-3 invoice-col">
-                <b>Reseller Details</b>
-                <address>
-                  <strong>{{ form.p_o_c.reseller_company_name }}</strong
-                  ><br />
-                  {{ form.p_o_c.reseller_company_address }}<br />
-                  {{ form.p_o_c.reseller_company_mail_id }}<br />
-                </address>
-              </div>
-              <div class="col-sm-3 invoice-col">
-                <b>Sales Person Details</b>
-                <address>
-                  <strong>{{ form.p_o_c.sales_person_name }}</strong
-                  ><br />
-                  {{ form.p_o_c.sales_person_address }}<br />
-                  {{ form.p_o_c.sales_person_mail_id }}
-                </address>
-              </div>
-              <!-- /.col -->
-              <div class="col-sm-3 invoice-col">
-                <b>Lead Generated By</b>
-                <address>
-                  <strong>{{ form.p_o_c.lead_generated_by }}</strong
-                  ><br />
-                  {{ form.p_o_c.lead_generatedby_address }}<br />
-                  {{ form.p_o_c.lead_generatedby_contactno }}<br />
-                  {{ form.p_o_c.lead_generatedby_mail }}
-                </address>
-              </div>
-              <!-- /.col -->
-            </div>
-            <!-- /.row -->
           </div>
-        </b-modal>
+        </div>
         <div class="modal fade" id="PaymentModal">
           <div class="modal-dialog modal-dialog-scrollable modal-xl">
             <div class="modal-content">
               <div class="modal-header">
                 <h4 class="modal-title">Payment Settings</h4>
 
-                <button type="button" class="close" data-dismiss="modal">
+                <button type="button" class="close" @click="closeModal">
                   &times;
                 </button>
               </div>
@@ -1182,7 +1271,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  data-dismiss="modal"
+                  @click="closeModal"
                 >
                   Close
                 </button>
@@ -1196,7 +1285,7 @@
               <div class="modal-header">
                 <h4 class="modal-title">SMS & WhatsApp Templates</h4>
 
-                <button type="button" class="close" data-dismiss="modal">
+                <button type="button" class="close" @click="closeModal">
                   &times;
                 </button>
               </div>
@@ -1377,7 +1466,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  data-dismiss="modal"
+                  @click="closeModal"
                 >
                   Close
                 </button>
@@ -1393,10 +1482,9 @@
 </template>
 
 <script>
-// import DateRangePicker from "vue2-daterange-picker";
-// import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 import Form from "vform";
 import LaravelVuePagination from "laravel-vue-pagination";
+import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 export default {
   components: {
     pagination: LaravelVuePagination,
@@ -1549,8 +1637,8 @@ export default {
       TemplatesLists: [],
       filter: new Form({
         dateRange: {
-          startDate: moment().format("YYYY-MM-DD"),
-          endDate: moment().format("YYYY-MM-DD"),
+          startDate:null,
+          endDate:null,
         },
       }),
       maxDate: moment().format("YYYY-MM-DD"),
@@ -1624,7 +1712,7 @@ export default {
     },
     messageModel(user) {
       this.smsForm.mobile = user.mobile;
-      Fire.$emit("openSendSMSModal");
+      $("#smsFormModal").modal("show");
     },
     loadUsers() {
       axios.all([
@@ -1658,7 +1746,7 @@ export default {
       axios
         .get("/api/tmpos-users", {
           params: {
-            q: this.$parent.search,
+            q: this.search,
             page: page,
             start: this.filter.dateRange.startDate
               ? moment(this.filter.dateRange.startDate).format(
@@ -1688,8 +1776,7 @@ export default {
         this.form.email_verified_at = moment().format("YYYY-MM-DD hh:mm a");
       }
       this.form.tmpos_id = this.randomNumber();
-
-      this.$refs["newModal"].show();
+      $("#newModal").modal("hide");
     },
     randomNumber: function () {
       return Math.floor(Math.random() * (100000000 - 1 + 1)) + 1;
@@ -1697,7 +1784,8 @@ export default {
     editModal(user) {
       this.editmode = true;
       this.form.reset();
-      this.$refs["newModal"].show();
+
+      $("#newModal").modal("show");
       this.form.fill(user);
 
       if (user.p_o_c) {
@@ -1793,7 +1881,7 @@ export default {
       this.form
         .post("api/tmpos-users")
         .then(({ data }) => {
-          this.$refs["newModal"].hide();
+          $("#newModal").modal("hide");
           toast.fire({
             type: "success",
             title: "User Created successfully",
@@ -1806,7 +1894,7 @@ export default {
       this.form
         .post("api/tmpos-users/" + this.form.id)
         .then(() => {
-          this.$refs["newModal"].hide();
+          $("#newModal").modal("hide");
           this.getResults(this.page);
           Swal.fire("Good job!", "Info has been updated !", "success");
         })
@@ -1847,7 +1935,7 @@ export default {
       });
     },
     cancel() {
-      this.$refs["newModal"].hide();
+      $("#newModal").modal("hide");
     },
     getPontOfContactList() {
       // PointOfContactList
@@ -1860,9 +1948,7 @@ export default {
         .catch(() => {});
     },
     viewPointOfDetail() {
-      // console.log(this.form.p_o_c);
-
-      this.$refs["pocModal"].show();
+      $("#pocModal").modal("hide");
     },
     download() {
       var url = "../tmpos-users";
@@ -1940,6 +2026,12 @@ export default {
       }
       // Directly return the joined string
       return splitStr.join(" ");
+    },
+    closeModal() {
+      $("#pocModal").modal("hide");
+      $("#TemplateModal").modal("hide");
+      $("#newModal").modal("hide");
+      $("#PaymentModal").modal("hide");
     },
   },
   mounted() {

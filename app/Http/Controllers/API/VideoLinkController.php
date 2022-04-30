@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\VideoLink;
+use App\Models\VideoLink;
 class VideoLinkController extends Controller
 {
     public function __construct()

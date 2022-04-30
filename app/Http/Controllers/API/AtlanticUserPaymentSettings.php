@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\TMPOSPaymnetSettings;
+use App\Models\TMPOSPaymnetSettings;
 use App\Http\Requests\UserPaymentSettingsRequest;
 class AtlanticUserPaymentSettings extends Controller
 {

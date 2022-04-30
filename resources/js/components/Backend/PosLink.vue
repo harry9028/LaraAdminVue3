@@ -98,10 +98,12 @@
                   :limit="8"
                   :show-disabled="true"
                 >
-                  <span slot="prev-nav"><i class="fas fa-caret-left"></i></span>
-                  <span slot="next-nav"
-                    ><i class="fas fa-caret-right"></i
-                  ></span>
+                  <template #prev-nav>
+                    <span>&lt; Previous</span>
+                  </template>
+                  <template #next-nav>
+                    <span>Next &gt;</span>
+                  </template>
                 </pagination>
               </div>
               <!-- /.card-body -->
@@ -126,12 +128,7 @@
                 <h5 class="modal-title" v-show="editmode" id="addNewLabel">
                   Update Info
                 </h5>
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
+                <button type="button" class="close" @click="closeModel">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -147,7 +144,12 @@
                       class="form-control"
                       :class="{ 'is-invalid': form.errors.has('link') }"
                     />
-                    <has-error :form="form" field="link"></has-error>
+
+                    <div
+                      class="text-danger"
+                      v-if="form.errors.has('link')"
+                      v-html="form.errors.get('link')"
+                    />
                   </div>
 
                   <div class="form-group">
@@ -160,14 +162,19 @@
                       class="form-control"
                       :class="{ 'is-invalid': form.errors.has('version') }"
                     />
-                    <has-error :form="form" field="version"></has-error>
+
+                    <div
+                      class="text-danger"
+                      v-if="form.errors.has('version')"
+                      v-html="form.errors.get('version')"
+                    />
                   </div>
                 </div>
                 <div class="modal-footer">
                   <button
                     type="button"
                     class="btn btn-danger"
-                    data-dismiss="modal"
+                    @click="closeModel"
                   >
                     Close
                   </button>
@@ -197,7 +204,12 @@
 </template>
 
 <script>
+import Form from "vform";
+import LaravelVuePagination from "laravel-vue-pagination";
 export default {
+  components: {
+    pagination: LaravelVuePagination,
+  },
   data() {
     return {
       // users empty array
@@ -215,15 +227,11 @@ export default {
   },
   methods: {
     SoftwareList() {
-      if (this.$gate.isSuperAdminOrAdmin()) {
-        this.$Progress.start();
-        this.isLoad = true;
-        axios.get("api/software").then(({ data }) => {
-          this.VersionList = data;
-          this.isLoad = false;
-        });
-        this.$Progress.finish();
-      }
+      this.isLoad = true;
+      axios.get("api/software").then(({ data }) => {
+        this.VersionList = data;
+        this.isLoad = false;
+      });
     },
     // Our method to GET results from a Laravel endpoint
     getResults(page = 1) {
@@ -247,21 +255,16 @@ export default {
       $("#newModal").modal("show");
     },
     updateUser() {
-      this.$Progress.start();
       this.form
         .post("api/software/" + this.form.id)
         .then(() => {
           $("#newModal").modal("hide");
-          Fire.$emit("AfterCreate");
+          $this.getResults();
           Swal.fire("Good job!", "Info has been updated !", "success");
-          this.$Progress.finish();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
     },
     createUser() {
-      this.$Progress.start();
       this.form
         .post("api/software")
         .then(({ data }) => {
@@ -270,24 +273,17 @@ export default {
             type: "success",
             title: "Link Created successfully",
           });
-          Fire.$emit("AfterCreate");
-          this.$Progress.finish();
+          $this.getResults();
         })
-        .catch(() => {
-          this.$Progress.fail();
-        });
+        .catch(() => {});
+    },
+    closeModel() {
+      $("#newModal").modal("hide");
     },
   },
   mounted() {
     this.SoftwareList();
-    Fire.$on("AfterCreate", () => {
-      this.SoftwareList();
-    });
-    Fire.$on("searching", () => {
-      this.getResults();
-    });
     this.access_level = window.gate.user.access_level.links.pos_links;
-    console.log(this.access_level);
   },
 };
 </script>
