@@ -14,13 +14,20 @@ class UserController extends Controller
     }
     public function index()
     {
-        // $this->authorize('isAdmin');
+        $search = \Request::get('q');
         $all = request()->input('all');
         if($all){
-                return User::latest()->select('id', 'name','email', 'contact_no')->get();
-            }else{
-                return User::latest()->paginate(10);
-            }
+            return User::latest()->select('id', 'name','email', 'contact_no')->get();
+        }else if($search){
+            $users = User::where(function($query) use ($search){
+                        $query->where('name','LIKE',"%$search%")
+                                ->orWhere('contact_no','LIKE',"%$search%")
+                                ->orWhere('email','LIKE',"%$search%");
+                    })->paginate(10);
+            return $users;
+        }else{
+            return User::latest()->paginate(10);
+        }
     }
 
     /**

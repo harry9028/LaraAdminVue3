@@ -31,7 +31,7 @@
             <div class="input-group-append">
               <button
                 class="btn btn-secondary"
-                @click="searchUser"
+                @click="getResults()"
                 type="button"
               >
                 Search
@@ -3014,9 +3014,11 @@ export default {
     },
     // Our method to GET results from a Laravel endpoint
     getResults(page = 1) {
-      axios.get(`api/user?page=${page}`).then((response) => {
-        this.users = response.data;
-      });
+      axios
+        .get("api/user?page=" + page + "&q=" + this.search)
+        .then((response) => {
+          this.users = response.data;
+        });
     },
     searchUser() {
       axios
