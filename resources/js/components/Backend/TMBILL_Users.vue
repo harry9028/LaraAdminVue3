@@ -596,7 +596,7 @@
                 <h5 class="modal-title" v-show="formSMS.id" id="addNewLabel">
                   Update Info
                 </h5>
-                <button type="button" class="close" @click="close">
+                <button type="button" class="close" @click="closeModal">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -773,7 +773,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-danger" @click="close">
+                  <button type="button" class="btn btn-danger" @click="closeModal">
                     Close
                   </button>
                   <button

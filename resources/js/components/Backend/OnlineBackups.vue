@@ -20,6 +20,25 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
+            <div class="input-group mb-3 col-md-4">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="search"
+                aria-label="search"
+                aria-describedby="basic-addon2"
+                v-model="search"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-secondary"
+                  @click="getResults"
+                  type="button"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">Online Backup</h3>
@@ -127,7 +146,7 @@ export default {
     getResults(page = 1) {
       this.isLoad = true;
       axios
-        .get("api/online-backup?q=" + this.$parent.search + "&page=" + page)
+        .get("api/online-backup?q=" + this.search + "&page=" + page)
         .then((response) => {
           this.VersionList = response.data;
           this.isLoad = false;

@@ -20,6 +20,25 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
+            <div class="input-group mb-3 col-md-4">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="search"
+                aria-label="search"
+                aria-describedby="basic-addon2"
+                v-model="search"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-secondary"
+                  @click="getResults"
+                  type="button"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">ENQUIRY DETAILS</h3>
@@ -186,7 +205,11 @@
                           class="form-control"
                           :class="{ 'is-invalid': form.errors.has('name') }"
                         />
-                        <has-error :form="form" field="name"></has-error>
+
+                        <div
+                          v-if="form.errors.has('name')"
+                          v-html="form.errors.get('name')"
+                        />
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -200,7 +223,11 @@
                           class="form-control"
                           :class="{ 'is-invalid': form.errors.has('email') }"
                         />
-                        <has-error :form="form" field="email"></has-error>
+
+                        <div
+                          v-if="form.errors.has('email')"
+                          v-html="form.errors.get('email')"
+                        />
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -214,7 +241,11 @@
                           class="form-control"
                           :class="{ 'is-invalid': form.errors.has('mobile') }"
                         />
-                        <has-error :form="form" field="mobile"></has-error>
+
+                        <div
+                          v-if="form.errors.has('mobile')"
+                          v-html="form.errors.get('mobile')"
+                        />
                       </div>
                     </div>
                   </div>
@@ -235,11 +266,10 @@
                           <option value="FeedbackLegend">FeedbackLegend</option>
                           <option value="Other">Other</option>
                         </select>
-
-                        <has-error
-                          :form="form"
-                          field="product_name"
-                        ></has-error>
+                        <div
+                          v-if="form.errors.has('product_name')"
+                          v-html="form.errors.get('product_name')"
+                        />
                       </div>
                     </div>
 
@@ -256,10 +286,10 @@
                             'is-invalid': form.errors.has('required_date'),
                           }"
                         />
-                        <has-error
-                          :form="form"
-                          field="required_date"
-                        ></has-error>
+                        <div
+                          v-if="form.errors.has('required_date')"
+                          v-html="form.errors.get('required_date')"
+                        />
                       </div>
                     </div>
 
@@ -276,7 +306,11 @@
                             'is-invalid': form.errors.has('trial_date'),
                           }"
                         />
-                        <has-error :form="form" field="trial_date"></has-error>
+
+                        <div
+                          v-if="form.errors.has('trial_date')"
+                          v-html="form.errors.get('trial_date')"
+                        />
                       </div>
                     </div>
                   </div>
@@ -293,7 +327,11 @@
                           class="form-control"
                           :class="{ 'is-invalid': form.errors.has('amount') }"
                         />
-                        <has-error :form="form" field="amount"></has-error>
+
+                        <div
+                          v-if="form.errors.has('amount')"
+                          v-html="form.errors.get('amount')"
+                        />
                       </div>
                     </div>
                     <div class="col-md-8">
@@ -307,7 +345,11 @@
                           class="form-control"
                           :class="{ 'is-invalid': form.errors.has('ref_from') }"
                         />
-                        <has-error :form="form" field="ref_from"></has-error>
+
+                        <div
+                          v-if="form.errors.has('ref_from')"
+                          v-html="form.errors.get('ref_from')"
+                        />
                       </div>
                     </div>
                   </div>
@@ -323,7 +365,11 @@
                           :class="{ 'is-invalid': form.errors.has('comment') }"
                         >
                         </textarea>
-                        <has-error :form="form" field="comment"></has-error>
+
+                        <div
+                          v-if="form.errors.has('comment')"
+                          v-html="form.errors.get('comment')"
+                        />
                       </div>
                     </div>
                     <div class="col-md-6">
@@ -338,7 +384,11 @@
                           :class="{ 'is-invalid': form.errors.has('address') }"
                         >
                         </textarea>
-                        <has-error :form="form" field="address"></has-error>
+
+                        <div
+                          v-if="form.errors.has('address')"
+                          v-html="form.errors.get('address')"
+                        />
                       </div>
                     </div>
                   </div>
@@ -419,10 +469,11 @@
                       <option value="tsv">tsv</option>
                       <option value="html">html</option>
                     </select>
-                    <has-error
-                      :form="exportForm"
-                      field="exportType"
-                    ></has-error>
+
+                    <div
+                      v-if="exportForm.errors.has('exportType')"
+                      v-html="exportForm.errors.get('exportType')"
+                    />
                   </div>
                   <div class="form-group" v-show="!ImportExport">
                     <VueCtkDateTimePicker
@@ -433,7 +484,11 @@
                       :noLabel="false"
                       :error="exportForm.errors.has('dateRange')"
                     />
-                    <has-error :form="exportForm" field="dateRange"></has-error>
+
+                    <div
+                      v-if="exportForm.errors.has('dateRange')"
+                      v-html="exportForm.errors.get('dateRange')"
+                    />
                   </div>
                 </div>
                 <div class="modal-footer">

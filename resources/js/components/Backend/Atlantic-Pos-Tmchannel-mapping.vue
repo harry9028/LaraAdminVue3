@@ -22,6 +22,25 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
+            <div class="input-group mb-3 col-md-4">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="search"
+                aria-label="search"
+                aria-describedby="basic-addon2"
+                v-model="search"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-secondary"
+                  @click="getAtlanticPosUsersMapping"
+                  type="button"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">
@@ -295,9 +314,7 @@ export default {
       this.page = page;
       this.isLoad = true;
       axios
-        .get(
-          "api/tmpos-users-mapping?q=" + this.$parent.search + "&page=" + page
-        )
+        .get("api/tmpos-users-mapping?q=" + this.search + "&page=" + page)
         .then((response) => {
           this.MappingUsers = response.data;
           this.isLoad = false;

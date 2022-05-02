@@ -1,8 +1,43 @@
 <template>
   <div class="content-wrapper">
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>TMBILL</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">TMBILL</a></li>
+              <li class="breadcrumb-item active">Our Employee</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </section>
     <div class="container">
       <div class="row">
         <div class="col-12">
+          <div class="input-group mb-3 col-md-4">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="search"
+              aria-label="search"
+              aria-describedby="basic-addon2"
+              v-model="search"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-secondary"
+                @click="searchUser"
+                type="button"
+              >
+                Search
+              </button>
+            </div>
+          </div>
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Users List</h3>
@@ -117,11 +152,7 @@
               <h5 class="modal-title" v-show="editmode" id="addNewLabel">
                 Update User's Info
               </h5>
-              <button
-                type="button"
-                class="close"
-                @click="closeModal"
-              >
+              <button type="button" class="close" @click="closeModal">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -2389,11 +2420,7 @@
               <h5 class="modal-title" id="exampleModalLongTitle">
                 Update SMS Info
               </h5>
-              <button
-                type="button"
-                class="close"
-                @click="closeModal"
-              >
+              <button type="button" class="close" @click="closeModal">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -2808,6 +2835,7 @@ export default {
         is_active: true,
         user_id: "",
       }),
+      search: "",
     };
   },
   methods: {
@@ -2986,13 +3014,13 @@ export default {
     },
     // Our method to GET results from a Laravel endpoint
     getResults(page = 1) {
-      axios.get("api/user?page=" + page).then((response) => {
+      axios.get(`api/user?page=${page}`).then((response) => {
         this.users = response.data;
       });
     },
-    searchUser(query, page = 1) {
+    searchUser() {
       axios
-        .get("api/findUser?q=" + query + "&page=" + page)
+        .get("api/findUser?q=" + this.search)
         .then((data) => {
           this.users = data.data;
         })

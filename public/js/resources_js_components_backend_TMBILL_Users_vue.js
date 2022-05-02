@@ -1781,7 +1781,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "close",
     onClick: _cache[20] || (_cache[20] = function () {
-      return _ctx.close && _ctx.close.apply(_ctx, arguments);
+      return $options.closeModal && $options.closeModal.apply($options, arguments);
     })
   }, _hoisted_144)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     onSubmit: _cache[30] || (_cache[30] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -1929,7 +1929,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "btn btn-danger",
     onClick: _cache[29] || (_cache[29] = function () {
-      return _ctx.close && _ctx.close.apply(_ctx, arguments);
+      return $options.closeModal && $options.closeModal.apply($options, arguments);
     })
   }, " Close "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_182, " Update ", 512
   /* NEED_PATCH */
