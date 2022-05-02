@@ -365,7 +365,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/user").then(function (response) {
         _this.users = response.data;
         toast.fire({
-          type: "success",
+          icon: "success",
           title: "Users load successfully"
         });
       });
@@ -395,7 +395,7 @@ __webpack_require__.r(__webpack_exports__);
         var data = _ref.data;
         $("#newModal").modal("hide");
         toast.fire({
-          type: "success",
+          icon: "success",
           title: "User Created successfully"
         });
 
@@ -421,7 +421,7 @@ __webpack_require__.r(__webpack_exports__);
       Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",

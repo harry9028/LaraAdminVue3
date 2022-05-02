@@ -2979,7 +2979,7 @@ export default {
       axios.get("api/user").then((response) => {
         this.users = response.data;
         toast.fire({
-          type: "success",
+          icon: "success",
           title: "Users load successfully",
         });
       });
@@ -3006,7 +3006,7 @@ export default {
         .then(({ data }) => {
           $("#newModal").modal("hide");
           toast.fire({
-            type: "success",
+            icon: "success",
             title: "User Created successfully",
           });
           this.loadUsers();
@@ -3029,7 +3029,7 @@ export default {
       Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
