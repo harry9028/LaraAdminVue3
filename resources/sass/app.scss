@@ -144,7 +144,7 @@ $fa-font-path: "../webfonts";
     background-color: #17a2b8;
 }
 .white:hover {
-    color: #ffffff;
+    color: #20c997;
 }
 .nav .nav-treeview > .nav-item > a {
     padding-left: 40px;
@@ -153,4 +153,10 @@ $fa-font-path: "../webfonts";
     display: inline;
     margin: 5px;
     white-space: normal;
+}
+[class*="sidebar-dark-"] .nav-treeview > .nav-item > .nav-link.active,
+[class*="sidebar-dark-"] .nav-treeview > .nav-item > .nav-link.active:focus,
+[class*="sidebar-dark-"] .nav-treeview > .nav-item > .nav-link.active:hover {
+    background-color: #6610f2;
+    color: #343a40;
 }

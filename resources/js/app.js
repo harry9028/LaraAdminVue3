@@ -59,6 +59,9 @@ const app = createApp({
             Fire.$emit('searching');
         }, 1000)
     },
+    mounted() {
+
+    },
 })
 app.use(router)
 app.component('sidebar', require('./components/backend/Sidebar.vue').default)

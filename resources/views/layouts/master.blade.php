@@ -65,7 +65,7 @@
             <!-- Sidebar Menu -->
              <sidebar></sidebar>
             <nav>
-                <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
+                <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="true">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
@@ -94,7 +94,7 @@
             <!-- Default to the left -->
             <strong>Copyright &copy; 
             {{ date('Y') }} - {{ date('Y', strtotime('+1 year')) }}
-            <a href="https://www.techmainstay.com/">TechMainstay</a>.</strong>
+            <a href="https://www.tmbill.com/">Powered by TMBill Software</a>. All rights reserved. Need Support Contact us at  support@tmbill.com</strong>
         </footer>
     </div>
     @auth

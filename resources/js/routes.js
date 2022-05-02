@@ -1,5 +1,10 @@
 const routes = [
     {
+        path: "/home",
+        name: "home",
+        component: () => import('./components/Backend/DashboardComponent.vue')
+    },
+    {
         path: "/dashboard",
         name: "dashboard",
         component: () => import('./components/Backend/DashboardComponent.vue')
