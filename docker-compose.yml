@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+    app:
+        build:
+            context: .
+            dockerfile: .docker/Dockerfile
+        image: "tmbill-admin"
+        ports:
+            - "127.0.0.1:8000:80"
+        volumes:
+            - ./:/var/www/html
+    db:
+        image: mysql:5.7.33
+        restart: always
+        ports:
+            - "127.0.0.1:3306:3306"
+        environment:
+            MYSQL_DATABASE: $DB_DATABASE
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+            MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+        volumes:
+            - ./db:/var/lib/mysql
